@@ -4,6 +4,7 @@ import "time"
 
 // WUser 客户端用户表。
 type WUser struct {
+	// 处理当前语句逻辑。
 	ID uint `gorm:"primaryKey" json:"id"`
 	// Username 用户名（全局唯一，兼容历史账号体系）。
 	Username string `gorm:"size:64;uniqueIndex;not null" json:"username"`
@@ -37,4 +38,5 @@ type WUser struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+// TableName 返回模型对应的数据表名。
 func (WUser) TableName() string { return "tk_users" }

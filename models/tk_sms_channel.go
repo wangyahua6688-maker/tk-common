@@ -4,6 +4,7 @@ import "time"
 
 // WSMSChannel 短信服务通道配置。
 type WSMSChannel struct {
+	// 处理当前语句逻辑。
 	ID uint `gorm:"primaryKey" json:"id"`
 	// Provider 提供商标识：aliyun/tencent/twilio/custom。
 	Provider string `gorm:"size:32;not null;default:'custom'" json:"provider"`
@@ -37,5 +38,5 @@ type WSMSChannel struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+// TableName 返回模型对应的数据表名。
 func (WSMSChannel) TableName() string { return "tk_sms_channel" }
-

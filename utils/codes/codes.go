@@ -25,20 +25,32 @@ const (
 
 // UserAuth 相关业务码。
 const (
+	// 更新当前变量或字段值。
 	UserAuthInvalidBodySendSMS = 40041
-	UserAuthPhoneRequired      = 40042
-	UserAuthInvalidBodyReg     = 40043
-	UserAuthPhonePwdRequired   = 40044
-	UserAuthInvalidBodyLogin   = 40045
-	UserAuthPhonePwdNeed       = 40046
-	UserAuthInvalidBodySMS     = 40047
-	UserAuthPhoneCodeRequired  = 40048
-	UserAuthAccessTokenNeed    = 40049
+	// 更新当前变量或字段值。
+	UserAuthPhoneRequired = 40042
+	// 更新当前变量或字段值。
+	UserAuthInvalidBodyReg = 40043
+	// 更新当前变量或字段值。
+	UserAuthPhonePwdRequired = 40044
+	// 更新当前变量或字段值。
+	UserAuthInvalidBodyLogin = 40045
+	// 更新当前变量或字段值。
+	UserAuthPhonePwdNeed = 40046
+	// 更新当前变量或字段值。
+	UserAuthInvalidBodySMS = 40047
+	// 更新当前变量或字段值。
+	UserAuthPhoneCodeRequired = 40048
+	// 更新当前变量或字段值。
+	UserAuthAccessTokenNeed = 40049
 )
 
 // Upstream 相关网关错误码。
 const (
+	// 更新当前变量或字段值。
 	UpstreamUnavailable = 50201
-	UpstreamEmptyReply  = 50202
-	UpstreamBadPayload  = 50203
+	// 更新当前变量或字段值。
+	UpstreamEmptyReply = 50202
+	// 更新当前变量或字段值。
+	UpstreamBadPayload = 50203
 )

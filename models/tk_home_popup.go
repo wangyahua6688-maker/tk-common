@@ -4,6 +4,7 @@ import "time"
 
 // WHomePopup 首页首屏弹窗配置。
 type WHomePopup struct {
+	// 处理当前语句逻辑。
 	ID uint `gorm:"primaryKey" json:"id"`
 	// Title 弹窗标题。
 	Title string `gorm:"size:120;not null" json:"title"`
@@ -33,5 +34,5 @@ type WHomePopup struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+// TableName 返回模型对应的数据表名。
 func (WHomePopup) TableName() string { return "tk_home_popup" }
-

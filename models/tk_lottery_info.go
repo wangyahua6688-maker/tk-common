@@ -60,4 +60,5 @@ type WLotteryInfo struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+// TableName 返回模型对应的数据表名。
 func (WLotteryInfo) TableName() string { return "tk_lottery_info" }

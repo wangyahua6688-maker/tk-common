@@ -83,4 +83,5 @@ type WDrawRecord struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+// TableName 返回模型对应的数据表名。
 func (WDrawRecord) TableName() string { return "tk_draw_record" }
