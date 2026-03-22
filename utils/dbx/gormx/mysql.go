@@ -4,8 +4,11 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/url"
+	"strings"
 	"time"
 
+	sqlmysql "github.com/go-sql-driver/mysql"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -54,6 +57,15 @@ func NewMySQL(cfg DBConfig) (*gorm.DB, error) {
 		return nil, fmt.Errorf("database DSN is empty")
 	}
 
+	// 固定数据库驱动解析/写入时区为东八区，避免宿主机处于东京、北美等时区时，
+	// “每天固定开奖时刻”这类 DATETIME 被错误地偏移后再写入数据库。
+	normalizedDSN, err := normalizeMySQLDSNToEast8(cfg.DSN)
+	// 判断条件并进入对应分支逻辑。
+	if err != nil {
+		// 返回当前处理结果。
+		return nil, fmt.Errorf("failed to normalize database dsn: %w", err)
+	}
+
 	// 定义并初始化 GORM 配置。
 	gormConfig := &gorm.Config{
 		// 使用单数表名，兼容现有表结构。
@@ -71,7 +83,7 @@ func NewMySQL(cfg DBConfig) (*gorm.DB, error) {
 	}
 
 	// 打开数据库连接。
-	db, err := gorm.Open(mysql.Open(cfg.DSN), gormConfig)
+	db, err := gorm.Open(mysql.Open(normalizedDSN), gormConfig)
 	// 判断条件并进入对应分支逻辑。
 	if err != nil {
 		// 返回当前处理结果。
@@ -97,6 +109,11 @@ func NewMySQL(cfg DBConfig) (*gorm.DB, error) {
 	if err := sqlDB.Ping(); err != nil {
 		// 返回当前处理结果。
 		return nil, fmt.Errorf("failed to ping database: %w", err)
+	}
+
+	// 会话时区也统一固定为东八区，保证 NOW()/默认值/数据库函数行为与开奖业务一致。
+	if err := db.Exec("SET time_zone = '+08:00'").Error; err != nil {
+		return nil, fmt.Errorf("failed to set mysql session time_zone: %w", err)
 	}
 
 	// 输出连接成功日志。
@@ -162,4 +179,39 @@ func LogLevelFromString(level string) logger.LogLevel {
 func GormLogLevelFromString(level string) logger.LogLevel {
 	// 返回当前处理结果。
 	return LogLevelFromString(level)
+}
+
+// normalizeMySQLDSNToEast8 统一修正 MySQL DSN 的时间参数。
+// 目标：
+// 1) parseTime 必须开启，避免 DATETIME 以字符串形式流转；
+// 2) loc 固定为 Asia/Shanghai，避免 loc=Local 随宿主机时区漂移；
+// 3) session time_zone 通过 SQL 单独设置，这里只处理驱动解析/格式化行为。
+func normalizeMySQLDSNToEast8(raw string) (string, error) {
+	cfg, err := sqlmysql.ParseDSN(strings.TrimSpace(raw))
+	if err != nil {
+		return "", err
+	}
+
+	loc, err := time.LoadLocation("Asia/Shanghai")
+	if err != nil {
+		return "", err
+	}
+
+	cfg.ParseTime = true
+	cfg.Loc = loc
+
+	// 保留 DSN 里其他 query 参数，仅补齐/覆盖驱动时间相关配置。
+	params := url.Values{}
+	for key, value := range cfg.Params {
+		params.Set(key, value)
+	}
+	cfg.Params = map[string]string{}
+	for key, values := range params {
+		if len(values) == 0 {
+			continue
+		}
+		cfg.Params[key] = values[0]
+	}
+
+	return cfg.FormatDSN(), nil
 }
