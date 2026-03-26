@@ -1,4 +1,4 @@
-module tk-common
+module github.com/wangyahua6688-maker/tk-common
 
 go 1.24.0
 
